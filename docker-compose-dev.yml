@@ -1,0 +1,46 @@
+# docker-compose-dev.yml
+# No 'version:' needed anymore
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: showfolio-api-dev
+    ports:
+      - "8080:8080"
+      - "5005:5005"  # optional debug
+    volumes:
+      - .:/app
+      - /app/build
+      - /app/.gradle
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/showfolio_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=showfolio_secret
+      - JAVA_OPTS=-XX:+UseZGC -XX:+ZGenerational
+      - SPRING_DEVTOOLS_RESTART_ENABLED=true
+      - SPRING_DEVTOOLS_LIVE_RELOAD_ENABLED=true
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:                           # ← This must exist and be followed by indented keys
+    image: postgres:17-alpine
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      - POSTGRES_DB=showfolio_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=showfolio_secret
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+
+volumes:
+  db-data:

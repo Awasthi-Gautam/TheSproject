@@ -1,0 +1,15 @@
+FROM eclipse-temurin:25
+
+WORKDIR /app
+
+COPY build.gradle settings.gradle gradlew ./
+COPY gradle ./gradle
+
+RUN ./gradlew dependencies --no-daemon
+
+COPY src ./src
+
+EXPOSE 8080
+EXPOSE 5005  
+
+CMD ["./gradlew", "bootRun", "--continuous", "--no-daemon"]
