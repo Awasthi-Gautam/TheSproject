@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    image: showfolio-api
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy # Wait for DB to be fully ready
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/showfolio_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=showfolio_secret
+      # Java 25 optimization
+      - JAVA_OPTS=-XX:+UseZGC -XX:+ZGenerational 
+
+  db:
+    image: postgres:18-alpine # Use PG 18 for the best multi-tenant schema performance
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      - POSTGRES_DB=showfolio_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=showfolio_secret
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      # Initial SQL to create the 'public' and 'test_school' schemas
+      - ./init-db:/docker-entrypoint-initdb.d 
+
+volumes:
+  db-data:
