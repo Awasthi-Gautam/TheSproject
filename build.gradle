@@ -27,6 +27,7 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'com.github.ben-manes.caffeine:caffeine'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	// implementation 'org.springframework.boot:spring-boot-starter-aop' // Failed to resolve, relying on transitive or will add aspectj explicitly if needed
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
@@ -38,6 +39,7 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	implementation 'org.postgresql:postgresql'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    // Dependencies refreshed
 }
 
 tasks.named('test') {

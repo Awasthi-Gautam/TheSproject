@@ -23,7 +23,7 @@ public class MarksController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or @accessService.hasAccess(principal.username, #classId, #subjectId)")
+    @com.example.security.RequiresSubjectAccess(classIdParam = "classId", subjectIdParam = "subjectId")
     public ResponseEntity<List<Marks>> getSubjectMarks(
             @RequestParam UUID classId,
             @RequestParam UUID subjectId) {
