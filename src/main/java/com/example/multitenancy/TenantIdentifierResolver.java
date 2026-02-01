@@ -11,7 +11,6 @@ import java.util.Optional;
 @Component
 public class TenantIdentifierResolver implements CurrentTenantIdentifierResolver {
 
-    private static final String DEFAULT_TENANT = "public";
     private static final String TENANT_HEADER = "X-Tenant-ID";
 
     @Override
@@ -23,7 +22,8 @@ public class TenantIdentifierResolver implements CurrentTenantIdentifierResolver
                 return tenantId;
             }
         }
-        return DEFAULT_TENANT;
+        throw new com.example.exception.TenantNotFoundException(
+                "Tenant header " + TENANT_HEADER + " is missing or empty.");
     }
 
     @Override
