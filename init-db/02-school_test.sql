@@ -60,3 +60,42 @@ CREATE TABLE IF NOT EXISTS timetable (
     FOREIGN KEY (subject_id) REFERENCES subjects(id),
     FOREIGN KEY (teacher_uacn) REFERENCES teachers(uacn)
 );
+
+CREATE TABLE IF NOT EXISTS student_contacts (
+    uacn VARCHAR(255) PRIMARY KEY,
+    address TEXT,
+    phone VARCHAR(20),
+    email VARCHAR(100),
+    emergency_contact VARCHAR(20),
+    FOREIGN KEY (uacn) REFERENCES students(uacn)
+);
+
+CREATE TABLE IF NOT EXISTS parent_details (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    uacn VARCHAR(255) NOT NULL,
+    father_name VARCHAR(255),
+    mother_name VARCHAR(255),
+    primary_phone VARCHAR(20),
+    occupation VARCHAR(100),
+    FOREIGN KEY (uacn) REFERENCES students(uacn)
+);
+
+CREATE TABLE IF NOT EXISTS fee_installments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    uacn VARCHAR(255) NOT NULL,
+    category_name VARCHAR(100),
+    amount_due DECIMAL(10, 2),
+    due_date DATE,
+    status VARCHAR(20),
+    FOREIGN KEY (uacn) REFERENCES students(uacn)
+);
+
+CREATE TABLE IF NOT EXISTS fee_payments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    installment_id UUID NOT NULL,
+    amount_paid DECIMAL(10, 2),
+    payment_date DATE,
+    payment_mode VARCHAR(50),
+    transaction_ref VARCHAR(100),
+    FOREIGN KEY (installment_id) REFERENCES fee_installments(id)
+);
