@@ -30,7 +30,7 @@ public class UacnService {
 
         UacnRegistry registryEntry = uacnRegistryRepository.findByAadhaarHash(aadhaarHash)
                 .orElseGet(() -> {
-                    String newUacn = generateUacn();
+                    String newUacn = generateRandomUacn();
                     UacnRegistry newEntry = new UacnRegistry(newUacn, aadhaarHash, name);
                     return uacnRegistryRepository.save(newEntry);
                 });
@@ -73,8 +73,26 @@ public class UacnService {
         return hexString.toString();
     }
 
+    // Public method to get or create UACN for a given Aadhaar (used for
+    // Principals/Teachers)
+    @Transactional
+    public String generateUacn(String aadhaar) {
+        String aadhaarHash = hashAadhaar(aadhaar);
+        return uacnRegistryRepository.findByAadhaarHash(aadhaarHash)
+                .map(UacnRegistry::getUacn)
+                .orElseGet(() -> {
+                    String newUacn = generateRandomUacn();
+                    UacnRegistry newEntry = new UacnRegistry(newUacn, aadhaarHash, "Principal/Teacher"); // Name isn't
+                                                                                                         // passed here,
+                                                                                                         // maybe update
+                                                                                                         // later
+                    uacnRegistryRepository.save(newEntry);
+                    return newUacn;
+                });
+    }
+
     // Simple UACN generator for demo purposes
-    private String generateUacn() {
+    private String generateRandomUacn() {
         return "UACN-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 }
