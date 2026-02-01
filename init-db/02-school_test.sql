@@ -111,3 +111,11 @@ CREATE TABLE IF NOT EXISTS subject_assignments (
     FOREIGN KEY (class_id) REFERENCES classes(id)
     -- FOREIGN KEY (subject_id) REFERENCES subjects(id) -- Assuming subjects table exists
 );
+
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id UUID PRIMARY KEY,
+    action_by_uacn VARCHAR(255),
+    target_uacn VARCHAR(255),
+    action_type VARCHAR(50),
+    timestamp TIMESTAMP
+);
