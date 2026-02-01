@@ -7,7 +7,9 @@ SET search_path TO school_test;
 CREATE TABLE IF NOT EXISTS students (
     uacn VARCHAR(255) PRIMARY KEY,
     roll_number VARCHAR(50),
-    admission_date DATE
+    admission_date DATE,
+    class_id UUID,
+    FOREIGN KEY (class_id) REFERENCES classes(id)
     -- Note: Foreign key to public.uacn_registry technically works in PG if you qualify it,
     -- but usually JPA handles validation. The DB constraint is good to have.
     -- FOREIGN KEY (uacn) REFERENCES public.uacn_registry(uacn)

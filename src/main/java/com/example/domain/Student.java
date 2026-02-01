@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Entity
 @Table(name = "students")
@@ -19,4 +20,5 @@ public class Student {
     private String uacn;
     private String rollNumber;
     private LocalDate admissionDate;
+    private UUID classId; // Mapped to class_id column
 }
