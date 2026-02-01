@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS teachers (
 CREATE TABLE IF NOT EXISTS classes (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
-    section VARCHAR(10)
+    section VARCHAR(10),
+    class_teacher_uacn VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS subjects (
@@ -100,4 +101,13 @@ CREATE TABLE IF NOT EXISTS fee_payments (
     payment_mode VARCHAR(50),
     transaction_ref VARCHAR(100),
     FOREIGN KEY (installment_id) REFERENCES fee_installments(id)
+);
+
+CREATE TABLE IF NOT EXISTS subject_assignments (
+    id UUID PRIMARY KEY,
+    uacn VARCHAR(255),
+    subject_id UUID,
+    class_id UUID,
+    FOREIGN KEY (class_id) REFERENCES classes(id)
+    -- FOREIGN KEY (subject_id) REFERENCES subjects(id) -- Assuming subjects table exists
 );

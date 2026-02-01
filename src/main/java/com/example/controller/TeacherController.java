@@ -48,11 +48,15 @@ public class TeacherController {
 
     private final com.example.repository.StudentRepository studentRepository;
 
+    private final com.example.repository.SubjectAssignmentRepository subjectAssignmentRepository;
+
     public TeacherController(TimetableRepository timetableRepository, StudentProfileService studentProfileService,
-            com.example.repository.StudentRepository studentRepository) {
+            com.example.repository.StudentRepository studentRepository,
+            com.example.repository.SubjectAssignmentRepository subjectAssignmentRepository) {
         this.timetableRepository = timetableRepository;
         this.studentProfileService = studentProfileService;
         this.studentRepository = studentRepository;
+        this.subjectAssignmentRepository = subjectAssignmentRepository;
     }
 
     @GetMapping("/my-classes")
@@ -60,6 +64,12 @@ public class TeacherController {
     public ResponseEntity<List<Timetable>> getMyClasses(Principal principal) {
         String teacherUacn = principal.getName();
         return ResponseEntity.ok(timetableRepository.findByTeacherUacn(teacherUacn));
+    }
+
+    @GetMapping("/my-assignments")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<List<com.example.domain.SubjectAssignment>> getMyAssignments(Principal principal) {
+        return ResponseEntity.ok(subjectAssignmentRepository.findByUacn(principal.getName()));
     }
 
     @GetMapping("/class-view/{classId}")

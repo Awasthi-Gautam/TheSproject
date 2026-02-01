@@ -1,0 +1,15 @@
+package com.example.repository;
+
+import com.example.domain.SubjectAssignment;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.UUID;
+
+@Repository
+public interface SubjectAssignmentRepository extends JpaRepository<SubjectAssignment, UUID> {
+    List<SubjectAssignment> findByUacn(String uacn);
+
+    boolean existsByUacnAndClassIdAndSubjectId(String uacn, UUID classId, UUID subjectId);
+}

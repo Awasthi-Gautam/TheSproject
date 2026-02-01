@@ -6,18 +6,17 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-
 import java.util.UUID;
 
 @Entity
-@Table(name = "classes")
+@Table(name = "subject_assignments")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SchoolClass {
+public class SubjectAssignment {
     @Id
     private UUID id;
-    private String name;
-    private String section;
-    private String classTeacherUacn;
+    private String uacn;
+    private UUID subjectId;
+    private UUID classId;
 }

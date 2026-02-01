@@ -10,4 +10,6 @@ import java.util.UUID;
 @Repository
 public interface MarksRepository extends JpaRepository<Marks, UUID> {
     List<Marks> findByUacn(String uacn);
+
+    List<Marks> findBySubjectId(UUID subjectId);
 }
