@@ -50,6 +50,16 @@ public class AuditLoggingAspect {
         saveLog(actor, "Assignment:" + assignmentId, "REVOKE_ASSIGNMENT");
     }
 
+    @AfterReturning("@annotation(logAudit)")
+    public void logAnnotatedAction(JoinPoint joinPoint, LogAudit logAudit) {
+        String actor = SecurityContextHolder.getContext().getAuthentication().getName();
+        String action = logAudit.action();
+
+        // For bulk import, we might want details like filename or success/failure
+        // Ideally we'd parse args, but for now simple logging:
+        saveLog(actor, "Method:" + joinPoint.getSignature().getName(), action);
+    }
+
     private void saveLog(String actor, String target, String action) {
         AuditLog log = new AuditLog(UUID.randomUUID(), actor, target, action, LocalDateTime.now());
         auditLogRepository.save(log);

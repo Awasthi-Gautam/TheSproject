@@ -14,8 +14,10 @@ import java.util.List;
 @Service
 public class CsvValidationService {
 
-    private static final String[] REQUIRED_HEADERS = { "aadhaar", "name", "dob", "mother_name", "father_name",
-            "category_code", "status_code", "class_id" };
+    private static final String[] REQUIRED_HEADERS = {
+            "aadhaar", "name", "dob", "mother_name", "father_name",
+            "category_code", "status_code", "class_id", "phone", "email"
+    };
 
     public List<CSVRecord> validateAndParse(InputStream inputStream) {
         try (InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
