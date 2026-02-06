@@ -22,4 +22,5 @@ public class Marks {
     private Integer scoreObtained;
     private Integer maxScore;
     private String term;
+    private UUID academicSessionId;
 }

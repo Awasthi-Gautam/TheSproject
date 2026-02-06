@@ -2,7 +2,8 @@
 
 **Project**: Multi-Tenant School Management System  
 **Database**: PostgreSQL with Dynamic Schema-per-Tenant Architecture  
-**Generated**: 2026-02-02
+**Generated**: 2026-02-06  
+**Last Updated**: 2026-02-06
 
 ---
 
@@ -987,6 +988,6 @@ src/main/java/com/example/multitenancy/TenantIdentifierResolver.java
 
 ---
 
-**Last Updated**: 2026-02-02  
-**Document Version**: 1.0  
+**Last Updated**: 2026-02-06  
+**Document Version**: 1.1  
 **Maintainer**: Development Team

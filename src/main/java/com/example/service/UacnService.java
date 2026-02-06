@@ -91,6 +91,24 @@ public class UacnService {
                 });
     }
 
+    // Public method to resolving UACN without saving to tenant student table
+    // immediately
+    @Transactional
+    public String resolveUacn(String aadhaar, String name) {
+        String aadhaarHash = hashAadhaar(aadhaar);
+
+        // Check if registry entry exists
+        return uacnRegistryRepository.findByAadhaarHash(aadhaarHash)
+                .map(UacnRegistry::getUacn)
+                .orElseGet(() -> {
+                    // Create new registry entry if not found
+                    String newUacn = generateRandomUacn();
+                    UacnRegistry newEntry = new UacnRegistry(newUacn, aadhaarHash, name);
+                    uacnRegistryRepository.save(newEntry);
+                    return newUacn;
+                });
+    }
+
     // Simple UACN generator for demo purposes
     private String generateRandomUacn() {
         return "UACN-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();

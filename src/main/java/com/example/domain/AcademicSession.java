@@ -11,15 +11,15 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
-@Table(name = "students")
+@Table(name = "academic_sessions")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Student {
+public class AcademicSession {
     @Id
-    private String uacn;
-    private String rollNumber;
-    private LocalDate admissionDate;
-    private UUID classId; // Mapped to class_id column
-    private UUID academicSessionId;
+    private UUID id;
+    private String name; // e.g., "2025-26"
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private boolean isActive;
 }

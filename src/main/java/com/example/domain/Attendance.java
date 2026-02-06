@@ -21,4 +21,5 @@ public class Attendance {
     private String uacn;
     private LocalDate date;
     private String status;
+    private UUID academicSessionId;
 }
