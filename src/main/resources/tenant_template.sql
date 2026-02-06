@@ -1,14 +1,7 @@
 -- Template for Tenant Schema
 -- This script is executed for each new tenant.
 
-CREATE TABLE IF NOT EXISTS students (
-    uacn VARCHAR(255) PRIMARY KEY,
-    roll_number VARCHAR(50),
-    admission_date DATE,
-    class_id UUID,
-    FOREIGN KEY (class_id) REFERENCES classes(id)
-);
-
+-- Create base tables first (no foreign key dependencies)
 CREATE TABLE IF NOT EXISTS teachers (
     uacn VARCHAR(255) PRIMARY KEY,
     staff_id VARCHAR(50),
@@ -27,6 +20,16 @@ CREATE TABLE IF NOT EXISTS subjects (
     name VARCHAR(100) NOT NULL
 );
 
+-- Now create student table (references classes)
+CREATE TABLE IF NOT EXISTS students (
+    uacn VARCHAR(255) PRIMARY KEY,
+    roll_number VARCHAR(50),
+    admission_date DATE,
+    class_id UUID,
+    FOREIGN KEY (class_id) REFERENCES classes(id)
+);
+
+-- Create tables that reference students, classes, subjects, or teachers
 CREATE TABLE IF NOT EXISTS marks (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     uacn VARCHAR(255) NOT NULL,

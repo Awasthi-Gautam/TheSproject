@@ -1,5 +1,6 @@
 package com.example.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -15,6 +16,7 @@ import lombok.AllArgsConstructor;
 public class UacnRegistry {
     @Id
     private String uacn;
+    @Column(name = "aadhaar_hash")
     private String aadhaarHash;
     private String name;
 }

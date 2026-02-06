@@ -11,19 +11,13 @@ import java.util.Optional;
 @Component
 public class TenantIdentifierResolver implements CurrentTenantIdentifierResolver {
 
-    private static final String TENANT_HEADER = "X-Tenant-ID";
-
     @Override
     public String resolveCurrentTenantIdentifier() {
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        if (requestAttributes instanceof ServletRequestAttributes) {
-            String tenantId = ((ServletRequestAttributes) requestAttributes).getRequest().getHeader(TENANT_HEADER);
-            if (tenantId != null && !tenantId.isBlank()) {
-                return tenantId;
-            }
+        String tenantId = TenantContext.getCurrentTenant();
+        if (tenantId != null && !tenantId.isBlank()) {
+            return tenantId;
         }
-        throw new com.example.exception.TenantNotFoundException(
-                "Tenant header " + TENANT_HEADER + " is missing or empty.");
+        return "PUBLIC"; // Fallback to default schema
     }
 
     @Override

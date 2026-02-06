@@ -17,11 +17,12 @@ CREATE TABLE IF NOT EXISTS public.uacn_registry (
 
 -- Organization Memberships table
 CREATE TABLE IF NOT EXISTS public.org_memberships (
-    uacn VARCHAR(255) NOT NULL,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    member_uacn VARCHAR(255) NOT NULL,
     org_id UUID NOT NULL,
     role VARCHAR(50) NOT NULL,
-    PRIMARY KEY (uacn, org_id),
-    FOREIGN KEY (uacn) REFERENCES public.uacn_registry(uacn),
+    joined_at DATE,
+    FOREIGN KEY (member_uacn) REFERENCES public.uacn_registry(uacn),
     FOREIGN KEY (org_id) REFERENCES public.organizations(id)
 );
 

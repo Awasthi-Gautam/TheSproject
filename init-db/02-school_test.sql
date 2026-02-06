@@ -1,20 +1,13 @@
--- Create the test tenant schema
+-- Create the tenant schema for the legacy demo "school_test"
 CREATE SCHEMA IF NOT EXISTS school_test;
 
+-- Create the tenant schema for manual testing "sch_test_alpha"
+CREATE SCHEMA IF NOT EXISTS sch_test_alpha;
+
+-- Setup school_test schema
 SET search_path TO school_test;
 
--- Execute the template logic (copy-pasted from template for this init script)
-CREATE TABLE IF NOT EXISTS students (
-    uacn VARCHAR(255) PRIMARY KEY,
-    roll_number VARCHAR(50),
-    admission_date DATE,
-    class_id UUID,
-    FOREIGN KEY (class_id) REFERENCES classes(id)
-    -- Note: Foreign key to public.uacn_registry technically works in PG if you qualify it,
-    -- but usually JPA handles validation. The DB constraint is good to have.
-    -- FOREIGN KEY (uacn) REFERENCES public.uacn_registry(uacn)
-);
-
+-- Create base tables first (no foreign key dependencies)
 CREATE TABLE IF NOT EXISTS teachers (
     uacn VARCHAR(255) PRIMARY KEY,
     staff_id VARCHAR(50),
@@ -33,6 +26,19 @@ CREATE TABLE IF NOT EXISTS subjects (
     name VARCHAR(100) NOT NULL
 );
 
+-- Now create student table (references classes)
+CREATE TABLE IF NOT EXISTS students (
+    uacn VARCHAR(255) PRIMARY KEY,
+    roll_number VARCHAR(50),
+    admission_date DATE,
+    class_id UUID,
+    FOREIGN KEY (class_id) REFERENCES classes(id)
+    -- Note: Foreign key to public.uacn_registry technically works in PG if you qualify it,
+    -- but usually JPA handles validation. The DB constraint is good to have.
+    -- FOREIGN KEY (uacn) REFERENCES public.uacn_registry(uacn)
+);
+
+-- Create tables that reference students, classes, subjects, or teachers
 CREATE TABLE IF NOT EXISTS marks (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     uacn VARCHAR(255) NOT NULL,

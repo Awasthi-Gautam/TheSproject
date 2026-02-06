@@ -13,6 +13,7 @@ import org.springframework.util.FileCopyUtils;
 
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Service
@@ -37,7 +38,11 @@ public class TenantProvisioningService {
         // 1. Generate Schema Name
         String schemaName = "sch_" + name.toLowerCase().replaceAll("[^a-z0-9]", "") + "_"
                 + UUID.randomUUID().toString().substring(0, 4);
+        createSchoolWithSchema(name, schemaName, principalAadhaar, principalName);
+    }
 
+    @Transactional
+    public void createSchoolWithSchema(String name, String schemaName, String principalAadhaar, String principalName) {
         // 2. Create Schema
         jdbcTemplate.execute("CREATE SCHEMA " + schemaName);
 
@@ -56,27 +61,12 @@ public class TenantProvisioningService {
 
         // 6. Create Membership (Principal as ADMIN)
         OrgMembership membership = new OrgMembership();
-        membership.setUacn(principalUacn);
+        membership.setId(UUID.randomUUID());
+        membership.setMemberUacn(principalUacn);
         membership.setOrgId(org.getId());
         membership.setRole("ADMIN"); // Granting Admin access
+        membership.setJoinedAt(LocalDate.now());
         orgMembershipRepository.save(membership);
-
-        // Also add Principal as Teacher in the tenant schema?
-        // Usually yes, but the prompt says: "Insert records into public.organizations
-        // and public.org_memberships".
-        // It doesn't explicitly say insert into tenant's `teachers` table, but for a
-        // bootstrap it's often needed.
-        // However, UACN Registry is public. So Auth will work.
-        // To be a "Teacher" in the system, they might need a record in `teachers` table
-        // of the tenant if we have FK checks.
-        // Our `SubjectAssignment` uses UACN string, not FK to `teachers` table (in Java
-        // entity, but SQL has FK).
-        // SQL has: FOREIGN KEY (teacher_uacn) REFERENCES teachers(uacn) in `timetable`.
-        // So if we schedule them, they need to be in `teachers`.
-        // But for "SubjectAssignment", the SQL I wrote doesn't enforce FK to `teachers`
-        // table (commented out or not present).
-        // Let's stick to the prompt requirements: "Insert records into
-        // public.organizations and public.org_memberships".
     }
 
     private void executeSchemaScript(String schemaName) {

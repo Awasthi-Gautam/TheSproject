@@ -30,6 +30,9 @@ public class MultiTenantConnectionProviderImpl implements MultiTenantConnectionP
     public Connection getConnection(Object tenantIdentifier) throws SQLException {
         String tenantId = (String) tenantIdentifier;
         Connection connection = getAnyConnection();
+        if ("PUBLIC".equalsIgnoreCase(tenantId) || "public".equalsIgnoreCase(tenantId)) {
+            return connection;
+        }
         try {
             connection.setSchema(tenantId);
         } catch (SQLException e) {

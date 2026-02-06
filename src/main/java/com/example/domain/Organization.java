@@ -1,5 +1,6 @@
 package com.example.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -18,5 +19,7 @@ public class Organization {
     @Id
     private UUID id;
     private String name;
+
+    @Column(name = "schema_name")
     private String schemaName;
 }
