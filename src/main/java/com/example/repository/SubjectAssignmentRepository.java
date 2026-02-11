@@ -11,5 +11,9 @@ import java.util.UUID;
 public interface SubjectAssignmentRepository extends JpaRepository<SubjectAssignment, UUID> {
     List<SubjectAssignment> findByUacn(String uacn);
 
+    List<SubjectAssignment> findAllByClassId(UUID classId);
+
     boolean existsByUacnAndClassIdAndSubjectId(String uacn, UUID classId, UUID subjectId);
+
+    boolean existsByUacnAndClassId(String uacn, UUID classId);
 }
