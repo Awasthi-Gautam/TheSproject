@@ -20,6 +20,8 @@ public class Timetable {
     private UUID classId;
     private UUID subjectId;
     private String teacherUacn;
-    private String day;
-    private String timeSlot;
+    private String dayOfWeek;
+    private java.time.LocalTime startTime;
+    private java.time.LocalTime endTime;
+    private String roomNumber;
 }

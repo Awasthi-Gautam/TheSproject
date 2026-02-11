@@ -23,6 +23,10 @@ public class CsvValidationService {
             "aadhaar", "name", "email", "phone", "staff_id", "department", "designation"
     };
 
+    public static final String[] TIMETABLE_IMPORT_HEADERS = {
+            "class_id", "subject_id", "teacher_uacn", "day_of_week", "start_time", "end_time", "room_number"
+    };
+
     public List<CSVRecord> validateAndParse(InputStream inputStream) {
         return validateAndParse(inputStream, REQUIRED_HEADERS);
     }
