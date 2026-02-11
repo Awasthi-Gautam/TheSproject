@@ -19,7 +19,15 @@ public class CsvValidationService {
             "category_code", "status_code", "class_id", "phone", "email"
     };
 
+    public static final String[] TEACHER_IMPORT_HEADERS = {
+            "aadhaar", "name", "email", "phone", "staff_id", "department", "designation"
+    };
+
     public List<CSVRecord> validateAndParse(InputStream inputStream) {
+        return validateAndParse(inputStream, REQUIRED_HEADERS);
+    }
+
+    public List<CSVRecord> validateAndParse(InputStream inputStream, String[] requiredHeaders) {
         try (InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
             CSVFormat format = CSVFormat.DEFAULT.builder()
                     .setHeader()
@@ -30,7 +38,7 @@ public class CsvValidationService {
 
             try (CSVParser parser = new CSVParser(reader, format)) {
                 // Validate headers
-                for (String header : REQUIRED_HEADERS) {
+                for (String header : requiredHeaders) {
                     if (!parser.getHeaderMap().containsKey(header)) {
                         throw new IllegalArgumentException("Missing required header: " + header);
                     }

@@ -17,4 +17,7 @@ public class Teacher {
     private String uacn;
     private String staffId;
     private String department;
+    private String designation;
+    private String email;
+    private String phone;
 }
