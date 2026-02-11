@@ -24,5 +24,6 @@ public class Timetable {
     private java.time.LocalTime startTime;
     private java.time.LocalTime endTime;
     private String roomNumber;
-    private boolean isDraft;
+    private UUID sessionId;
+    private String status; // 'DRAFT', 'PUBLISHED'
 }

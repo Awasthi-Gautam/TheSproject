@@ -20,6 +20,7 @@ public class TimetableGenerationService {
     private final SubjectAssignmentRepository subjectAssignmentRepository;
     private final SubjectRepository subjectRepository;
     private final SchoolClassRepository schoolClassRepository;
+    private final AuditLogRepository auditLogRepository;
 
     private static final List<String> DAYS = List.of("MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY");
     private static final int PERIODS_PER_DAY = 8;
@@ -30,30 +31,31 @@ public class TimetableGenerationService {
     public TimetableGenerationService(TimetableRepository timetableRepository,
             SubjectAssignmentRepository subjectAssignmentRepository,
             SubjectRepository subjectRepository,
-            SchoolClassRepository schoolClassRepository) {
+            SchoolClassRepository schoolClassRepository,
+            AuditLogRepository auditLogRepository) {
         this.timetableRepository = timetableRepository;
         this.subjectAssignmentRepository = subjectAssignmentRepository;
         this.subjectRepository = subjectRepository;
         this.schoolClassRepository = schoolClassRepository;
+        this.auditLogRepository = auditLogRepository;
     }
 
-    public void generateAll(String sessionId) {
-        // Find all classes (optionally filter by session if SchoolClass has session
-        // link,
-        // but for now findAll() as per current SchoolClass definition checks)
-        // If SchoolClass has sessionId, we should filter.
-        // Assuming all active classes for now.
+    public void generateAll(UUID sessionId) {
+        generateSchedulesForSession(sessionId, new com.example.dto.TimetableConfig());
+    }
+
+    public void generateSchedulesForSession(UUID sessionId, com.example.dto.TimetableConfig config) {
         List<SchoolClass> classes = schoolClassRepository.findAll();
 
         try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
             for (SchoolClass cls : classes) {
-                executor.submit(() -> generateClassSchedule(cls.getId(), sessionId));
+                executor.submit(() -> generateClassSchedule(cls.getId(), sessionId, config));
             }
         }
     }
 
     @Transactional
-    public void generateClassSchedule(UUID classId, String sessionId) {
+    public void generateClassSchedule(UUID classId, UUID sessionId, com.example.dto.TimetableConfig config) {
         // 1. Fetch Assignments
         List<SubjectAssignment> assignments = subjectAssignmentRepository.findAllByClassId(classId);
         if (assignments.isEmpty())
@@ -75,11 +77,24 @@ public class TimetableGenerationService {
         List<Timetable> generatedEntries = new ArrayList<>();
         Map<String, Map<UUID, Integer>> subjectDailyCounts = new HashMap<>(); // Day -> SubjectID -> Count
 
-        for (String day : DAYS) {
+        // Define Days
+        List<String> days = DAYS.subList(0, Math.min(config.getDaysPerWeek(), DAYS.size()));
+
+        int slotsCreated = 0;
+        Set<UUID> assignedSubjects = new HashSet<>();
+
+        for (String day : days) {
             subjectDailyCounts.put(day, new HashMap<>());
             LocalTime currentStartTime = START_TIME;
 
-            for (int period = 1; period <= PERIODS_PER_DAY; period++) {
+            for (int period = 1; period <= config.getPeriodsPerDay(); period++) {
+
+                // Check Break Slot
+                if (period == config.getBreakSlot() + 1) {
+                    currentStartTime = currentStartTime.plusMinutes(PERIOD_DURATION_MINUTES + BREAK_DURATION_MINUTES);
+                    continue;
+                }
+
                 LocalTime currentEndTime = currentStartTime.plusMinutes(PERIOD_DURATION_MINUTES);
 
                 // Attempt to place a subject
@@ -94,15 +109,10 @@ public class TimetableGenerationService {
                         continue;
 
                     // B. Teacher Conflict (Global Check)
-                    // We check if teacher is busy in existing 'Live' or 'Draft' timetables.
                     if (timetableRepository.existsByTeacherConflict(teacherUacn, day, currentStartTime,
                             currentEndTime)) {
                         continue;
                     }
-
-                    // C. Class Conflict (Already filled? We are building sequentially so this slot
-                    // is empty effectively, but just in case)
-                    // Logic here implies we only fill empty slots.
 
                     // Place it!
                     Timetable entry = new Timetable();
@@ -113,10 +123,14 @@ public class TimetableGenerationService {
                     entry.setDayOfWeek(day);
                     entry.setStartTime(currentStartTime);
                     entry.setEndTime(currentEndTime);
-                    entry.setDraft(true); // Draft Mode
+                    entry.setRoomNumber("TBD");
+                    entry.setSessionId(sessionId);
+                    entry.setStatus("DRAFT");
 
                     generatedEntries.add(entry);
                     subjectDailyCounts.get(day).put(subjectId, currentCount + 1);
+                    slotsCreated++;
+                    assignedSubjects.add(subjectId);
                     break; // Move to next period
                 }
 
@@ -125,6 +139,37 @@ public class TimetableGenerationService {
         }
 
         timetableRepository.saveAll(generatedEntries);
+
+        // Identify unresolvable subjects (those that got 0 slots)
+        long unresolvableCount = assignments.stream()
+                .map(SubjectAssignment::getSubjectId)
+                .distinct()
+                .filter(id -> !assignedSubjects.contains(id))
+                .count();
+
+        // Audit Log
+        com.example.domain.AuditLog log = new com.example.domain.AuditLog();
+        log.setId(UUID.randomUUID());
+        log.setActionByUacn("SYSTEM");
+        log.setTargetUacn("CLASS:" + classId);
+        log.setActionType("TIMETABLE_GENERATION");
+        log.setTimestamp(java.time.LocalDateTime.now());
+        // We really want to store details like "Slots: X, Unresolvable: Y".
+        // Since AuditLog entity only has basic fields, we might overload 'actionType'
+        // or check if there's another field.
+        // The entity shows: id, actionByUacn, targetUacn, actionType, timestamp.
+        // We will append details to actionType or targetUacn if needed, but cleaner is
+        // to keep actionType Enum-like.
+        // Let's use targetUacn to store some metadata if possible "CLASS:ID |
+        // Slots:X..." or just accept limitation.
+        // Request said: "Log the generation event, including the number of slots
+        // successfully created and any 'unresolvable' subjects"
+        // Without a 'details' column, I'll format actionType carefully or abuse
+        // targetUacn slightly.
+        // Better: "TIMETABLE_GEN_Slots_" + slotsCreated + "_Unres_" + unresolvableCount
+        log.setActionType("TIMETABLE_GEN_OK: Slots=" + slotsCreated + ", Unresolved=" + unresolvableCount);
+
+        auditLogRepository.save(log);
     }
 
     private boolean isCore(Subject subject) {
