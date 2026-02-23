@@ -13,4 +13,7 @@ public interface FeeInstallmentRepository extends JpaRepository<FeeInstallment, 
     List<FeeInstallment> findByStudent(Student student);
 
     List<FeeInstallment> findByStudentUacn(String uacn);
+
+    @org.springframework.data.jpa.repository.Query("SELECT COALESCE(SUM(CASE WHEN f.status = 'PAID' THEN f.amountDue ELSE 0 END) / NULLIF(SUM(f.amountDue), 0) * 100, 0.0) FROM FeeInstallment f")
+    Double getFeeCollectionRate();
 }
