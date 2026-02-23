@@ -34,4 +34,7 @@ public interface SchoolClassRepository extends JpaRepository<SchoolClass, UUID> 
 
         String getClassTeacherName();
     }
+
+    java.util.Optional<com.example.domain.SchoolClass> findByClassTeacherUacnAndAcademicSessionId(String uacn,
+            UUID sessionId);
 }
