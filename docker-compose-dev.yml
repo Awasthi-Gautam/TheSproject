@@ -18,6 +18,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/showfolio_db
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=showfolio_secret
+      - SPRING_PROFILES_ACTIVE=dev
       - JAVA_OPTS=-XX:+UseZGC -XX:+ZGenerational
       - SPRING_DEVTOOLS_RESTART_ENABLED=true
       - SPRING_DEVTOOLS_LIVE_RELOAD_ENABLED=true
@@ -38,7 +39,7 @@ services:
       - POSTGRES_PASSWORD=showfolio_secret
     volumes:
       - db-data:/var/lib/postgresql/data
-      - ./init-db:/docker-entrypoint-initdb.d
+      - ./init-db-minimal:/docker-entrypoint-initdb.d  # Only schema, no test data
     ports:
       - "5433:5432"
 

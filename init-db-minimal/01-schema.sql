@@ -1,0 +1,29 @@
+-- Create the public schema if it doesn't exist (usually it does)
+CREATE SCHEMA IF NOT EXISTS public;
+
+-- Organizations table
+CREATE TABLE IF NOT EXISTS public.organizations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    schema_name VARCHAR(255) NOT NULL UNIQUE
+);
+
+-- UACN Registry table
+CREATE TABLE IF NOT EXISTS public.uacn_registry (
+    uacn VARCHAR(255) PRIMARY KEY,
+    aadhaar_hash VARCHAR(255) NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255),
+    password_hash VARCHAR(255)
+);
+
+-- Organization Memberships table
+CREATE TABLE IF NOT EXISTS public.org_memberships (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    member_uacn VARCHAR(255) NOT NULL,
+    org_id UUID NOT NULL,
+    role VARCHAR(50) NOT NULL,
+    joined_at DATE,
+    FOREIGN KEY (member_uacn) REFERENCES public.uacn_registry(uacn),
+    FOREIGN KEY (org_id) REFERENCES public.organizations(id)
+);

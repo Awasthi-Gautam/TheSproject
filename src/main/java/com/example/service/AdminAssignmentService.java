@@ -22,7 +22,12 @@ public class AdminAssignmentService {
             throw new RuntimeException("Assignment already exists");
         }
 
-        SubjectAssignment assignment = new SubjectAssignment(UUID.randomUUID(), uacn, subjectId, classId);
+        SubjectAssignment assignment = new SubjectAssignment();
+        assignment.setId(UUID.randomUUID());
+        assignment.setUacn(uacn);
+        assignment.setSubjectId(subjectId);
+        assignment.setClassId(classId);
+        assignment.setAcademicSessionId(null); // Explicitly null until session logic is added here
         return subjectAssignmentRepository.save(assignment);
     }
 

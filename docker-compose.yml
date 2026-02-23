@@ -13,6 +13,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/showfolio_db
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=showfolio_secret
+      - SPRING_PROFILES_ACTIVE=dev
       # Java 25 optimization
       - JAVA_OPTS=-XX:+UseZGC -XX:+ZGenerational 
 

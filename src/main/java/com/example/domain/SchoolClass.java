@@ -22,4 +22,6 @@ public class SchoolClass {
     private String section;
     @Column(name = "class_teacher_uacn")
     private String classTeacherUacn;
+    @Column(name = "academic_session_id")
+    private UUID academicSessionId;
 }

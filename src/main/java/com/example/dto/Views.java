@@ -9,4 +9,7 @@ public class Views {
 
     public interface Admin extends Teacher {
     }
+
+    public interface StudentOnly extends Public {
+    }
 }

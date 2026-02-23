@@ -125,6 +125,7 @@ CREATE TABLE IF NOT EXISTS academic_sessions (
 );
 
 ALTER TABLE students ADD COLUMN IF NOT EXISTS academic_session_id UUID;
+ALTER TABLE classes ADD COLUMN IF NOT EXISTS academic_session_id UUID;
 ALTER TABLE marks ADD COLUMN IF NOT EXISTS academic_session_id UUID;
 ALTER TABLE attendance ADD COLUMN IF NOT EXISTS academic_session_id UUID;
 

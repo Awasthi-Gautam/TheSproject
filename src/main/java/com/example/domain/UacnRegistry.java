@@ -19,4 +19,7 @@ public class UacnRegistry {
     @Column(name = "aadhaar_hash")
     private String aadhaarHash;
     private String name;
+    private String email;
+    @Column(name = "password_hash")
+    private String passwordHash;
 }

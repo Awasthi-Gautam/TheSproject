@@ -1,6 +1,7 @@
 package com.example.domain;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -20,4 +21,8 @@ public class Teacher {
     private String designation;
     private String email;
     private String phone;
+    @Column(name = "employment_type")
+    private String employmentType;
+    @Column(name = "joining_date")
+    private java.time.LocalDate joiningDate;
 }

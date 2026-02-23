@@ -1,6 +1,7 @@
 package com.example.domain;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -19,4 +20,6 @@ public class SubjectAssignment {
     private String uacn;
     private UUID subjectId;
     private UUID classId;
+    @Column(name = "academic_session_id")
+    private UUID academicSessionId;
 }

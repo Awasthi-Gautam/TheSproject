@@ -31,21 +31,20 @@ public class UacnService {
         UacnRegistry registryEntry = uacnRegistryRepository.findByAadhaarHash(aadhaarHash)
                 .orElseGet(() -> {
                     String newUacn = generateRandomUacn();
-                    UacnRegistry newEntry = new UacnRegistry(newUacn, aadhaarHash, name);
+                    UacnRegistry newEntry = new UacnRegistry();
+                    newEntry.setUacn(newUacn);
+                    newEntry.setAadhaarHash(aadhaarHash);
+                    newEntry.setName(name);
                     return uacnRegistryRepository.save(newEntry);
                 });
 
-        // Check if student already exists in this tenant (optional, but good practice)
         if (studentRepository.existsById(registryEntry.getUacn())) {
-            // Already registered in this school
             return registryEntry.getUacn();
         }
 
         Student student = new Student();
         student.setUacn(registryEntry.getUacn());
         student.setAdmissionDate(LocalDate.now());
-        // Set other default fields if necessary
-
         studentRepository.save(student);
 
         return registryEntry.getUacn();
@@ -82,10 +81,10 @@ public class UacnService {
                 .map(UacnRegistry::getUacn)
                 .orElseGet(() -> {
                     String newUacn = generateRandomUacn();
-                    UacnRegistry newEntry = new UacnRegistry(newUacn, aadhaarHash, "Principal/Teacher"); // Name isn't
-                                                                                                         // passed here,
-                                                                                                         // maybe update
-                                                                                                         // later
+                    UacnRegistry newEntry = new UacnRegistry();
+                    newEntry.setUacn(newUacn);
+                    newEntry.setAadhaarHash(aadhaarHash);
+                    newEntry.setName("Principal/Teacher");
                     uacnRegistryRepository.save(newEntry);
                     return newUacn;
                 });
@@ -103,7 +102,10 @@ public class UacnService {
                 .orElseGet(() -> {
                     // Create new registry entry if not found
                     String newUacn = generateRandomUacn();
-                    UacnRegistry newEntry = new UacnRegistry(newUacn, aadhaarHash, name);
+                    UacnRegistry newEntry = new UacnRegistry();
+                    newEntry.setUacn(newUacn);
+                    newEntry.setAadhaarHash(aadhaarHash);
+                    newEntry.setName(name);
                     uacnRegistryRepository.save(newEntry);
                     return newUacn;
                 });
